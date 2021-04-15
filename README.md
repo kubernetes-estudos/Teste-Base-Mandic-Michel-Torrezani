@@ -1,1 +1,0 @@
-# Teste-Base-Mandic-SeuNome
