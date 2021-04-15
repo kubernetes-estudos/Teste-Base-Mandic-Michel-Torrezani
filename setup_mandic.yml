@@ -1,0 +1,77 @@
+---
+- hosts: webservers
+  remote_user: root
+  tasks:
+      - name: "Install EPEL release for nginx"
+        yum: name=epel-release state=present
+
+      - name: "Install nginx web server"
+        yum: name=nginx state=installed update_cache=true
+          
+      - name: "Upload the default index.html file"
+        copy: src=/root/ansible/teste-mandic/index.html dest=/usr/share/nginx/www/ mode=0644
+     
+      - name: "Upload the default nginx.conf file"
+        copy: src=/root/ansible/teste-mandic/nginx.conf dest=/etc/nginx mode=0644
+        notify:
+          - Enabled iptables
+          - Disabled Selinux 
+          - start nginx
+    
+  handlers:
+  
+    - name: Disabled Selinux 
+      selinux: 
+        state: disabled
+     
+    - name: Enabled iptables
+      shell: iptables -A INPUT -p tcp --dport 80 -j ACCEPT 
+                                
+    - name: start nginx
+      service: name=nginx enabled=yes state=started
+                          
+                                                     
+- hosts: webservers
+  remote_user: root
+  tasks:                                                      
+      - name: "Install pre-requisite packages"
+        yum:
+         name: "{{item}}"
+         state: latest
+        loop:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+       
+      - name: "Add Docker CE repo"
+        get_url:
+         url: https://download.docker.com/linux/centos/docker-ce.repo
+         dest: /etc/yum.repos.d/docker-ce.repo
+           
+      - name: "Install Docker"
+        yum: name=docker state=latest
+        
+      - name: "Copy docker compose"
+        copy:
+          src: ./{{ item }}
+          dest: /root/{{ item }}
+        loop:
+        - docker-compose.yml
+        - site       
+  
+      - name: "Start and enable the Docker daemon"
+        service: name=docker state=started enabled=yes
+        notify:
+          - start compose
+  handlers:
+    - name: start compose
+      shell: docker-compose stop; docker-compose rm -f; docker-compose -f /root/docker-compose.yml up -d
+
+
+
+ 
+
+        
+
+
+
