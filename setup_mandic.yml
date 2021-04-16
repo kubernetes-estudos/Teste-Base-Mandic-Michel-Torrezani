@@ -9,10 +9,10 @@
         yum: name=nginx state=installed update_cache=true
           
       - name: "Upload the default index.html file"
-        copy: src=/root/ansible/teste-mandic/index.html dest=/usr/share/nginx/www/ mode=0644
+        copy: src=./ dest=/usr/share/nginx/www/ mode=0644
      
       - name: "Upload the default nginx.conf file"
-        copy: src=/root/ansible/teste-mandic/nginx.conf dest=/etc/nginx mode=0644
+        copy: src=./ dest=/etc/nginx mode=0644
         notify:
           - Enabled iptables
           - Disabled Selinux 
@@ -58,14 +58,12 @@
         loop:
         - docker-compose.yml
         - site       
-  
+         
       - name: "Start and enable the Docker daemon"
         service: name=docker state=started enabled=yes
-        notify:
-          - start compose
-  handlers:
-    - name: start compose
-      shell: docker-compose stop; docker-compose rm -f; docker-compose -f /root/docker-compose.yml up -d
+        
+      - name: start compose
+        shell: /usr/local/bin/docker-compose stop; docker-compose rm -f; docker-compose -f /root/docker-compose.yml up -d
 
 
 
