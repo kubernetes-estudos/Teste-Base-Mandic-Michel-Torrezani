@@ -3,15 +3,19 @@ version: "3.9"
 services:
   db:
     image: mysql:5.7
+    ports:
+      - "3306:3306"      
     volumes:
-      - db_data:/var/lib/mysql
+      - ./sqlserver:/docker-entrypoint-initdb.d
+
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_ROOT_PASSWORD: myrootmandic
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-    
+   
+
   wordpress:
     depends_on:
       - db
@@ -24,7 +28,7 @@ services:
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DB_NAME: wordpress
-
+  
   tomcat:
     image: bitnami/tomcat:latest
     ports:
@@ -37,7 +41,35 @@ services:
      volumes:
       - ./site:/usr/share/nginx/html/
 
+  magento:
+    depends_on:
+      - db
+    image: alexcheng/magento2:latest
+    ports:
+      - "8002:80"
+    restart: always
+    environment:
+      MYSQL_HOST: db
+      MYSQL_ROOT_PASSWORD: myrootmandic
+      MYSQL_USER: magento
+      MYSQL_PASSWORD: mandicsucesso
+      MYSQL_DATABASE: magento
+      MAGENTO_LANGUAGE: pt_BR
+      MAGENTO_TIMEZONE: America/Sao_Paulo
+      MAGENTO_DEFAULT_CURRENCY: BRL
+      MAGENTO_URL: http://local.magento
+      MAGENTO_BACKEND_FRONTNAME: admin
+      MAGENTO_USE_SECURE: 0
+      MAGENTO_BASE_URL_SECURE: 0
+      MAGENTO_USE_SECURE_ADMIN: 0
+      MAGENTO_ADMIN_FIRSTNAME: Admin
+      MAGENTO_ADMIN_LASTNAME: MinhaLoja
+      MAGENTO_ADMIN_EMAIL: amdin@mandic.com.br
+      MAGENTO_ADMIN_USERNAME: admin
+      MAGENTO_ADMIN_PASSWORD: magentorocks1 
+    
 volumes:
   db_data: {}
+
 
 
