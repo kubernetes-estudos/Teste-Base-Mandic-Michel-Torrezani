@@ -1,9 +1,12 @@
 ---
-- hosts: webservers 
+- name: Setup_mandic
+
+  hosts:  localhost
+
+  become: true
+ 
   remote_user: root
   tasks:
-      - name: "Create user nginx"
-        shell: useradd -s /bin/false nginx
 
       - name: "Install EPEL release for nginx"
         yum: name=epel-release state=present
@@ -34,7 +37,12 @@
       service: name=nginx enabled=yes state=started
                           
                                                      
-- hosts: webservers
+- name: Setup_mandic
+
+  hosts:  localhost
+
+  become: true
+
   remote_user: root
   tasks:                                                      
       - name: "Install pre-requisite packages"
@@ -61,13 +69,23 @@
         loop:
         - docker-compose.yml
         - site/
-        - sqlserver/       
+        - mysqlserver/       
          
       - name: "Start and enable the Docker daemon"
-        service: name=docker state=started enabled=yes        
+        service: name=docker state=started enabled=yes
+   
+      - name: Instalando o Docker Compose
+
+        get_url:
+
+          url: https://github.com/docker/compose/releases/download/1.29.1/docker-compose-Linux-x86_64
+
+          dest: /usr/local/bin/docker-compose mode=0755
+
+                  
             
       - name: "start compose"
-        shell: /usr/local/bin/docker-compose stop; docker-compose rm -f; docker-compose -f /root/docker-compose.yml up -d
+        shell: docker-compose stop; docker-compose up -d
 
 
 

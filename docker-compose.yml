@@ -6,7 +6,7 @@ services:
     ports:
       - "3306:3306"      
     volumes:
-      - ./sqlserver:/docker-entrypoint-initdb.d
+      - ./mysqlserver:/docker-entrypoint-initdb.d
 
     restart: always
     environment:
