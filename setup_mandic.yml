@@ -74,17 +74,16 @@
       - name: "Start and enable the Docker daemon"
         service: name=docker state=started enabled=yes
    
-      - name: Instalando o Docker Compose
+      - name: "Installing Docker Composer"  
+        shell: sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
-        get_url:
+      - name: "Executable permissions to binary"
+        shell: sudo chmod +x /usr/local/bin/docker-compose
 
-          url: https://github.com/docker/compose/releases/download/1.29.1/docker-compose-Linux-x86_64
-
-          dest: /usr/local/bin/docker-compose mode=0755
-
-                  
-            
-      - name: "start compose"
+      - name: "Symbolic link" 
+        shell: sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+           
+      - name: "Start compose"
         shell: docker-compose stop; docker-compose up -d
 
 
